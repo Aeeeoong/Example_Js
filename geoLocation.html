@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>geolocation</title>
+    <style>
+   
+    </style>
+</head>
+<body>
+    <h1>geolocation</h1>
+    <div>
+        <button onclick="displayCoords()">현재 좌표 표시</button>
+        <!-- <input type="button" value="현재 좌표 표시" onclick="displayCoords()"> -->
+         <div id="displayCoords"></div>
+    </div>
+    <div>
+        <button onclick="displayDistance()">최단거리순</button>
+        <table id="list_distance">
+            <th>거리</th>
+            <th>가게명</th>
+            <th>주소</th>
+        </table>
+    </div>
+    <script>
+        if ('geolocation' in navigator) {
+            console.log("위치정보 사용 가능") 
+        } else {
+            console.log("위치정보 사용 불가능")
+        }
+        let latitude, longitude;
+        navigator.geolocation.getCurrentPosition((position) => {
+            latitude = position.coords.latitude;
+            longitude = position.coords.longitude;
+            console.log(latitude, longitude)
+        })
+
+        let disCoords = document.getElementById("displayCoords");
+
+        const mapList = [
+            { name : "도노카페", addr : "대전광역시 유성구 신성동 산 10-1", latitude : "34.1541", longitude : "123.41113" },
+            { name : "옛날통닭", addr : "대전광역시 동구 용전동 용산 120-3", latitude : "34.4556", longitude : "123.7783" },
+            { name : "코끼리떡집", addr : "대전광역시 서구 둔산동 뒷산 20-23", latitude : "34.9511", longitude : "122.99783" },
+            { name : "따르타르", addr : "대전광역시 중구 선화동 동산 313-8", latitude : "33.151", longitude : "121.7833" },
+            { name : "모퉁이커피", addr : "대전광역시 동구 중리동 옆산 13-7", latitude : "33.887", longitude : "122.1399" },
+        ]
+
+        
+        const displayCoords = () => {
+            disCoords.innerHTML='<div>경도 : '+ latitude +'</div>'
+            disCoords.insertAdjacentHTML("beforeend","<div>위도 : "+ longitude + "</div>")
+        }
+
+        const getDistance = (lat1, lon1, lat2, lon2, unit) => {
+            let radlad1 = Math.PI * lat1/180;
+            let radlad2 = Math.PI * lat2/180;
+            let radlon1 = Math.PI * lon1/180;
+            let radlon2 = Math.PI * lon2/180;
+            let theta = lon1-lon2;
+            let redtheta = Math.PI * theta/180;
+            let dist = Math.sin(radlad1) * Math.sin(radlad2) + Math.cos(radlad1) * Math.cos(radlad2) * Math.cos(redtheta);
+            dist = Math.acos(dist);
+            dist = dist * 180/Math.PI;
+            dist = dist * 60 * 1.1515;
+            if (unit=="K") { dist = dist * 1.1609344;}
+            if (unit=="N") { dist = dist * 0.8684; }
+
+            return Math.round(dist)
+        }
+        let table = document.getElementById("list_distance")
+        const displayDistance = () => {
+            for(let i=0; i<mapList.length; i++) {
+                let distance = getDistance(latitude, longitude, mapList[i].latitude, mapList[i].longitude,"K")
+                // console.log(mapList[i].name + "과(와) 거리는 " + distance + "입니다.")
+                mapList[i].distance = distance
+            }
+            let newMapList = mapList.sort(function(a, b) {
+                return a.distance - b.distance
+            })
+            console.log(typeof newMapList[0].distance)
+            for(let j=0; newMapList.length; j++){
+                table.insertAdjacentHTML("beforeend","<tr><td>" + newMapList[j].distance + "</td><td>"+ newMapList[j].name +"</td><td>" + newMapList[j].addr + "</td></tr>")
+            }
+        }
+
+    </script>
+</body>
+</html>
