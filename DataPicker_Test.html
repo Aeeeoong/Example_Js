@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>DatePicker_Test</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        table {
+            width: 100%;
+        }
+        table, th, td {
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #222;
+        }
+        th {
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <input type="text" id="input_date"/>
+        <div id="carlendar_box">
+            <div>
+                <button type="button" onclick="changeMonth(-1)" >&#60</button>
+                <input type="text" id="input_year" value="2024" onchange="changeYear()">
+                <select id="select_month" onchange="changeMonth()">
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                    <option value="6">6</option>
+                    <option value="7">7</option>
+                    <option value="8">8</option>
+                    <option value="9">9</option>
+                    <option value="10">10</option>
+                    <option value="11">11</option>
+                    <option value="12">12</option>
+                </select>
+                <button type="button" onclick="changeMonth(1)">&#62</button>
+            </div>
+            <table id="table">
+                <thead>
+                    <th>일</th>
+                    <th>월</th>
+                    <th>화</th>
+                    <th>수</th>
+                    <th>목</th>
+                    <th>금</th>
+                    <th>토</th>
+                </thead>
+                <tbody id="table_body"></tbody>
+            </table>
+        </div>
+    </div>
+    <script>
+        function checkLeapYear(year) {
+            if  (year % 400 == 0) return true
+            else if (year % 100 == 0) return false
+            else if (year % 4 == 0) return true
+            else return false
+        }
+
+        function getFirstDayOfWeek(year, month) {
+            if (month <10) month = "0" + month
+            return new Date(year +"-"+ month + "-01").getDay()
+        }
+
+        function changeYearMonth(year, month) {
+            let month_day = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
+            let arr_calender = []
+        
+            if (checkLeapYear(year)) month[1] = 29
+            
+            for (let i = 0; i<getFirstDayOfWeek(year,month);i++){
+                arr_calender.push("")
+            }
+
+            for(let i = 1; i <=month_day[month-1];i++) {
+                arr_calender.push(i.toString())
+            }
+            
+            let last_day = arr_calender.length % 7
+            if (last_day < 7) {
+                for (let i=0; i< 7-last_day; i++) {
+                    arr_calender.push("")
+                }
+            }
+            console.log(arr_calender)
+            console.log(last_day)
+
+            renderCalender(arr_calender)
+        }
+        changeYearMonth(2024,10)
+
+        function renderCalender(data) {
+            let carlendar = document.getElementById("table_body")
+            let h = []
+
+            for(let i=0;i<data.length;i++){
+                if (i==0) {
+                    h.push('<tr>')
+                } else if (i % 7 == 0) {
+                    h.push('</tr>')
+                    h.push('<tr>')
+                } 
+                h.push(
+                    '<td onClick="setDate('+data[i]+')"; style="cursor:pointer;">' + data[i] + '</td>'
+                )
+                
+            }
+            h.push("</tr>")
+            carlendar.innerHTML = h.join("")
+            console.log(carlendar)
+        }
+
+        function setDate(day) {
+            if (day < 10) day = "0" + day
+            document.getElementById("input_date").value = current_year +"-"+current_month+"-"+day
+        }
+
+        function changeYear() {
+
+        }
+
+        function changeMonth() {
+
+        }
+        
+        let current_year = new Date().getFullYear()
+        let current_month = new Date().getMonth() + 1
+
+        document.getElementById("input_year").value = current_year
+        document.getElementById("select_month").value = current_month
+        changeYearMonth(current_year,current_month)
+
+    </script>
+</body>
+</html>
